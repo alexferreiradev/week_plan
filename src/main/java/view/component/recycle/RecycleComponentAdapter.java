@@ -2,9 +2,11 @@ package view.component.recycle;
 
 import javax.swing.*;
 
-public interface RecycleComponentAdapter {
+public interface RecycleComponentAdapter<ItemType> {
 
-	int getItemPosition();
+	int getItemPosition(ItemType item);
+
+	ItemType getItem(int position);
 
 	int getTotalItems();
 

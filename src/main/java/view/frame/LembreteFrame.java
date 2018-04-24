@@ -1,9 +1,11 @@
 package view.frame;
 
 import model.Lembrete;
+import view.adapter.LembreteAdapter;
 import view.component.ActionBar;
 import view.component.LeftMenu;
 import view.component.menu.MenuOption;
+import view.component.recycle.RecycleComponent;
 
 import javax.swing.*;
 import java.awt.*;
@@ -118,8 +120,11 @@ public class LembreteFrame extends BaseFrame implements LeftMenu.OptionListener,
             addItemJp(itemsJP, lembrete);
         }
 
-        JScrollPane jScrollPane = new JScrollPane(itemsJP);
-        mainJP.add(jScrollPane);
+//        JScrollPane jScrollPane = new JScrollPane(itemsJP);
+        LembreteAdapter lembreteAdapter = new LembreteAdapter(mLembreteList);
+        RecycleComponent recycleComponent = new RecycleComponent(lembreteAdapter);
+        mainJP.add(recycleComponent);
+//        mainJP.add(jScrollPane);
 
         pack();
     }
