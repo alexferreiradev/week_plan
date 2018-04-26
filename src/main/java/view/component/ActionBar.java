@@ -74,6 +74,7 @@ public class ActionBar extends BaseComponent {
         removeAll();
         setupComponentViews();
         isOptionMenuListShowing = false;
+        updateUI();
     }
 
     public boolean isOptionMenuListShowing() {
@@ -83,6 +84,7 @@ public class ActionBar extends BaseComponent {
     public void showOptionMenuList() {
         addMenuOptionsViews();
         isOptionMenuListShowing = true;
+        updateUI();
     }
 
     public interface ActionBarMenuListener {
