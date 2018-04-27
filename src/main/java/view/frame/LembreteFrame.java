@@ -5,8 +5,9 @@ import view.adapter.LembreteAdapter;
 import view.component.ActionBar;
 import view.component.LeftMenu;
 import view.component.LeftMenu.OptionListener;
+import view.component.OrderComponent;
 import view.component.menu.MenuOption;
-import view.component.recycle.RecycleComponent;
+import view.component.recycle.RecycleComponentJpanel;
 
 import javax.swing.*;
 import java.awt.*;
@@ -17,7 +18,7 @@ import java.awt.event.ActionListener;
 import java.util.ArrayList;
 import java.util.List;
 
-public class LembreteFrame extends BaseFrame implements OptionListener, ActionListener, ActionBar.ActionBarMenuListener, LembreteAdapter.LembreteListener {
+public class LembreteFrame extends BaseFrame implements OptionListener, ActionListener, ActionBar.ActionBarMenuListener, LembreteAdapter.LembreteListener, OrderComponent.OrderChangeListener {
 
 	public static final String EXPORT_TO_INBOX_ACTION = "export_lembrete_to_inbox_search";
 	public static final String SELECT_DESELECT_LEMBRETE_ACTION = "select_deselect_lembrete";
@@ -30,6 +31,8 @@ public class LembreteFrame extends BaseFrame implements OptionListener, ActionLi
 	private JFrame mMainFrame;
 	private LeftMenu mLeftMenu;
 	private ActionBar mActionBar;
+	private LembreteAdapter mLembreteAdapter;
+	private RecycleComponentJpanel mRecycleLembrete;
 
 	public LembreteFrame(JFrame mainFrame, List<Lembrete> lembreteList) throws HeadlessException {
 		this.mMainFrame = mainFrame;
@@ -50,7 +53,7 @@ public class LembreteFrame extends BaseFrame implements OptionListener, ActionLi
 		mContentPanel.add(mainJP, BorderLayout.CENTER);
 
 		buildMainPanel();
-		showLembreteSelectionList();
+		buildLembreteSelectionList();
 
 		pack();
 	}
@@ -81,13 +84,9 @@ public class LembreteFrame extends BaseFrame implements OptionListener, ActionLi
 	private void removeSelectedLembrete() {
 		mActionBar.hideOptionsMenu();
 		for (Lembrete lembrete : mSelectedLembreteList) {
-			mLembreteList.remove(lembrete);
+			mLembreteAdapter.removeItem(mLembreteAdapter.getItemPosition(lembrete));
 		}
-
-		mainJP.removeAll();
-		mainJP.add(mActionBar);
-
-		showLembreteSelectionList();
+		mRecycleLembrete.notifyAdapterChanged();
 	}
 
 	private void exportToInbox() {
@@ -113,19 +112,11 @@ public class LembreteFrame extends BaseFrame implements OptionListener, ActionLi
 		systemClipboard.setContents(stringSelection, stringSelection);
 	}
 
-	private void showLembreteSelectionList() {
+	private void buildLembreteSelectionList() {
 		mSelectedLembreteList = new ArrayList<>();
-		for (Lembrete lembrete : mLembreteList) {
-
-		}
-
-//        JScrollPane jScrollPane = new JScrollPane(itemsJP);
-		LembreteAdapter lembreteAdapter = new LembreteAdapter(mLembreteList, this);
-		RecycleComponent recycleComponent = new RecycleComponent(lembreteAdapter);
-		mainJP.add(recycleComponent);
-//        mainJP.add(jScrollPane);
-
-		pack();
+		mLembreteAdapter = new LembreteAdapter(mLembreteList, this, this);
+		mRecycleLembrete = new RecycleComponentJpanel(mLembreteAdapter);
+		mainJP.add(mRecycleLembrete);
 	}
 
 	@Override
@@ -163,5 +154,16 @@ public class LembreteFrame extends BaseFrame implements OptionListener, ActionLi
 		if (mSelectedLembreteList.isEmpty() && mActionBar.isOptionMenuListShowing()) {
 			mActionBar.hideOptionsMenu();
 		}
+	}
+
+	@Override
+	public void onIncreaseOrder(int currentOrder, int newOrder, OrderComponent component) {
+		mRecycleLembrete.changeItemPosition(currentOrder, newOrder);
+	}
+
+	@Override
+	public void onDecreaseOrder(int currentOrder, int newOrder, OrderComponent component) {
+		mRecycleLembrete.changeItemPosition(currentOrder, newOrder);
+		// todo remover e trocar interface para onChangeOrder
 	}
 }
