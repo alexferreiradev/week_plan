@@ -14,11 +14,12 @@ import static java.awt.Component.LEFT_ALIGNMENT;
 import static java.awt.Component.TOP_ALIGNMENT;
 import static view.frame.LembreteFrame.SELECT_DESELECT_LEMBRETE_ACTION;
 
-public class LembreteAdapter implements RecycleComponentAdapter<Lembrete> {
+public class LembreteAdapter implements RecycleComponentAdapter<Lembrete>,OrderComponent.OrderAdapter {
 
 	private List<Lembrete> lembreteList;
 	private LembreteListener mLembreteListener;
 	private OrderComponent.OrderChangeListener mOrderChangeListener;
+//	private OrderComponent prevComponent;
 
 	public LembreteAdapter(List<Lembrete> lembreteList, LembreteListener lembreteListener, OrderComponent.OrderChangeListener mOrderChangeListener) {
 		this.lembreteList = lembreteList;
@@ -44,6 +45,12 @@ public class LembreteAdapter implements RecycleComponentAdapter<Lembrete> {
 	@Override
 	public Lembrete getItem(int position) {
 		return lembreteList.get(position);
+	}
+
+	@Override
+	public void changeItemPosition(int oldPosition, int newPosition) {
+		Lembrete lembrete = lembreteList.remove(oldPosition);
+		lembreteList.add(newPosition, lembrete);
 	}
 
 	@Override
@@ -82,7 +89,15 @@ public class LembreteAdapter implements RecycleComponentAdapter<Lembrete> {
 		});
 
 		itemJP.add(checkBox);
-		OrderComponent orderComponent = new OrderComponent(position + 1, mOrderChangeListener);
+		OrderComponent orderComponent = new OrderComponent(position, mOrderChangeListener, this);
+//		if (prevComponent == null) {
+//			prevComponent = orderComponent;
+//		} else {
+//			orderComponent.setmPrevOrderComponent(prevComponent);
+//			prevComponent.setmNextOrderComponent(orderComponent);
+//			prevComponent = orderComponent;
+//		}
+
 		itemJP.add(orderComponent);
 		// todo add ao model estado (ENUM) e mudar descricao de acordo com estado
 		itemJP.add(new JLabel(lembrete.getDescricao()));
@@ -94,7 +109,12 @@ public class LembreteAdapter implements RecycleComponentAdapter<Lembrete> {
 		itemsJP.add(Box.createHorizontalStrut(3));
 	}
 
-	public interface LembreteListener {
+	@Override
+	public int getMaxOrder() {
+		return lembreteList.size();
+	}
+
+	public interface LembreteListener extends OrderComponent.OrderChangeListener {
 
 		void onSelectedLembrete(Lembrete lembrete, int position);
 

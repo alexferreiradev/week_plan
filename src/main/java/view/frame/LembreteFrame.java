@@ -157,13 +157,8 @@ public class LembreteFrame extends BaseFrame implements OptionListener, ActionLi
 	}
 
 	@Override
-	public void onIncreaseOrder(int currentOrder, int newOrder, OrderComponent component) {
-		mRecycleLembrete.changeItemPosition(currentOrder, newOrder);
-	}
-
-	@Override
-	public void onDecreaseOrder(int currentOrder, int newOrder, OrderComponent component) {
-		mRecycleLembrete.changeItemPosition(currentOrder, newOrder);
-		// todo remover e trocar interface para onChangeOrder
+	public void onChangeOrder(int currentOrder, int newOrder, OrderComponent component) {
+		mLembreteAdapter.changeItemPosition(currentOrder, newOrder);
+		mRecycleLembrete.notifyAdapterChanged();
 	}
 }

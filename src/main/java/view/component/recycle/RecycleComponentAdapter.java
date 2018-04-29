@@ -12,6 +12,8 @@ public interface RecycleComponentAdapter<ItemType> {
 
 	ItemType getItem(int position);
 
+	void changeItemPosition(int oldPosition, int newPosition);
+
 	int getTotalItems();
 
 	JComponent getView(int position);

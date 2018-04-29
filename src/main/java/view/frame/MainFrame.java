@@ -50,20 +50,20 @@ public class MainFrame extends BaseFrame implements LeftMenu.OptionListener {
     private String buildTestTextToDebug() {
         return "Resultados principais\n" +
                 "Lembrete\n" +
-                "Preparar férias\n" +
+                "1Preparar férias\n" +
                 "Lembrete\n" +
-                "add atalho no intellij para compare With clipboard\n" +
+                "2add atalho no intellij para compare With clipboard\n" +
                 "Lembrete\n" +
-                "configurar vpn da ZG no note\n" +
+                "3configurar vpn da ZG no note\n" +
                 "Lembrete\n" +
-                "verificar com pais, quanto estavam devendo\n" +
+                "4verificar com pais, quanto estavam devendo\n" +
                 "Lembrete\n" +
-                "pesquisar embalador de vacuo e criar documento com diferentes modelos e marcas\n" +
+                "5pesquisar embalador de vacuo e criar documento com diferentes modelos e marcas\n" +
                 "Todos os resultados\n" +
                 "Lembrete\n" +
-                "teste agendado\n" +
+                "6teste agendado\n" +
                 "Lembrete\n" +
-                "teste 2\n" +
+                "7teste 2\n" +
                 "Lembrete\n" +
                 "Verificar pagamentos realizados pelo Itau no dia 10/04\n" +
                 "Lembrete\n" +
