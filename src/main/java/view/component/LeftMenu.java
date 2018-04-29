@@ -1,12 +1,11 @@
 package view.component;
 
+import view.adapter.LeftMenuAdapter;
 import view.component.menu.MenuOption;
+import view.component.recycle.RecycleComponentJpanel;
 
 import javax.swing.*;
-import javax.swing.border.LineBorder;
 import java.awt.*;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
 import java.util.List;
 
 public class LeftMenu extends BaseComponent {
@@ -16,27 +15,32 @@ public class LeftMenu extends BaseComponent {
 
     private JLabel mTitleLabel;
     private List<MenuOption> mOptionList;
-    private JPanel mOptionListPanel;
-    private OptionListener mOptionListener;
+    private LeftMenuAdapter.Listener mOptionListener;
+    private RecycleComponentJpanel mRecycleOption;
+    private LeftMenuAdapter mAdapter;
 
     public LeftMenu(String title) {
-        mOptionListPanel = new JPanel();
         mTitleLabel = new JLabel(title);
-
         setupComponentViews();
     }
 
-    public LeftMenu(String title, List<MenuOption> optionList, OptionListener optionListener) {
+    public LeftMenu(String title, List<MenuOption> optionList, LeftMenuAdapter.Listener optionListener) {
         this(title);
         this.mOptionList = optionList;
         this.mOptionListener = optionListener;
-
-        setupOptionListView();
+        createOptionsView();
     }
 
     @Override
     protected void setupComponentViews() {
         setupTitleView();
+    }
+
+    private void createOptionsView() {
+        mAdapter = new LeftMenuAdapter(mOptionList, mOptionListener);
+        mRecycleOption = new RecycleComponentJpanel(mAdapter);
+        mRecycleOption.setAlignmentX(CENTER_ALIGNMENT);
+        add(mRecycleOption, BorderLayout.CENTER);
     }
 
     @Override
@@ -45,20 +49,6 @@ public class LeftMenu extends BaseComponent {
         setPreferredSize(new Dimension(WIDTH, HEIGHT));
         setMinimumSize(new Dimension(WIDTH, HEIGHT));
         setBackground(Color.WHITE);
-    }
-
-    private void setupOptionListView() {
-        //todo trocar para component listView
-        add(mOptionListPanel, BorderLayout.CENTER);
-
-        mOptionListPanel.setBackground(Color.BLUE);
-
-        int position = 0;
-        for (MenuOption menuOption : mOptionList) {
-            JComponent optionView = createOptionView(menuOption, position++);
-
-            mOptionListPanel.add(optionView);
-        }
     }
 
     private void setupTitleView() {
@@ -74,25 +64,28 @@ public class LeftMenu extends BaseComponent {
         mTitleLabel.setForeground(Color.BLACK);
     }
 
-    private JComponent createOptionView(final MenuOption menuOption, final int position) {
-        JButton optionJB = new JButton(menuOption.getTitle());
-        Font font = optionJB.getFont();
-        optionJB.setFont(font.deriveFont(Font.PLAIN, 16f));
-        optionJB.setBorder(new LineBorder(Color.BLACK, 0));
-        optionJB.setPreferredSize(new Dimension(WIDTH - 16, 50));
-        optionJB.addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                mOptionListener.onOptionSelected(menuOption, position);
-            }
-        });
-
-        return optionJB;
+    public int getMenuPosition(String menuAction) {
+        return searchMenuPosByAction(menuAction);
     }
 
-    public interface OptionListener {
+    private int searchMenuPosByAction(String menuAction) {
+        for (int i = 0; i < mAdapter.getTotalItems(); i++) {
+            MenuOption menuOption = mAdapter.getItem(i).getItem();
+            if (menuOption.getAction().equalsIgnoreCase(menuAction)) {
+                return i;
+            }
+        }
 
-        void onOptionSelected(final MenuOption option, final int position);
+        return -1;
+    }
 
+    public void setMenuEnableState(String action, boolean state) {
+        mAdapter.getItem(searchMenuPosByAction(action)).setEnabled(state);
+        mRecycleOption.notifyAdapterChanged();
+    }
+
+    public void setMenuToolTip(String action, String toolTip) {
+        mAdapter.getItem(searchMenuPosByAction(action)).setToolTip(toolTip);
+        mRecycleOption.notifyAdapterChanged();
     }
 }

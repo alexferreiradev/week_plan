@@ -73,8 +73,8 @@ public class ActionBar extends BaseComponent {
         // todo trocar para Jpanel e setar visible
         removeAll();
         setupComponentViews();
-        isOptionMenuListShowing = false;
         updateUI();
+		isOptionMenuListShowing = false;
     }
 
     public boolean isOptionMenuListShowing() {
@@ -83,8 +83,8 @@ public class ActionBar extends BaseComponent {
 
     public void showOptionMenuList() {
         addMenuOptionsViews();
-        isOptionMenuListShowing = true;
         updateUI();
+		isOptionMenuListShowing = true;
     }
 
     public interface ActionBarMenuListener {

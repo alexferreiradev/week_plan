@@ -9,20 +9,20 @@ import java.util.Date;
 import java.util.List;
 import java.util.Map;
 
-public class LembreteBuilder {
+public class LembreteListBuilder {
 
     private List<Lembrete> lembreteList;
 
-    public LembreteBuilder() {
+	public LembreteListBuilder() {
         lembreteList = new ArrayList<>();
     }
 
-    public static LembreteBuilder fromJson(Map<String, ?> json) {
+	public static LembreteListBuilder fromJson(Map<String, ?> json) {
         throw new NotImplementedException();
     }
 
-    public static LembreteBuilder fromTextList(List<String> lembreteTextList) {
-        LembreteBuilder builder = new LembreteBuilder();
+	public static LembreteListBuilder fromTextList(List<String> lembreteTextList) {
+		LembreteListBuilder builder = new LembreteListBuilder();
         Long idGenareted = 1L;
         for (String lembreteText : lembreteTextList) {
             Lembrete lembrete = new Lembrete();

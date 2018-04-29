@@ -13,19 +13,19 @@ public class OrderComponent extends JPanel {
 	private JButton mUpOrderJB;
 	private JButton mDownOrderJB;
 	private OrderChangeListener mListener;
-	private OrderAdapter mAdapter;
+	private int mTotalItems;
 //	private OrderComponent mPrevOrderComponent;
 //	private OrderComponent mNextOrderComponent;
 
 	/**
-	 *  @param order - ordem entre 0 e Max int. Portanto, o elemento 1 terá ordem 0.
+	 * @param order      - ordem entre 0 e Max int. Portanto, o item 1 terá ordem 0.
 	 * @param listener
-	 * @param adapter
+	 * @param totalItems
 	 */
-	public OrderComponent(int order, OrderChangeListener listener, OrderAdapter adapter) {
+	public OrderComponent(int order, OrderChangeListener listener, int totalItems) {
 		mOrder = order;
 		mListener = listener;
-		mAdapter = adapter;
+		mTotalItems = totalItems;
 //		mPrevOrderComponent = null;
 //		mNextOrderComponent = null;
 
@@ -64,8 +64,8 @@ public class OrderComponent extends JPanel {
 		mDownOrderJB.setPreferredSize(new Dimension(100, 15));
 		int padW = 12;
 		int padH = 8;
-		mUpOrderJB.setMargin(new Insets(padH,padW,padH,padW));
-		mDownOrderJB.setMargin(new Insets(padH + 2,padW + 2,padH + 2,padW + 3));
+		mUpOrderJB.setMargin(new Insets(padH, padW, padH, padW));
+		mDownOrderJB.setMargin(new Insets(padH + 2, padW + 2, padH + 2, padW + 3));
 //		mUpOrderJB.setBorder(new LineBorder(Color.BLACK, 1));
 //		mDownOrderJB.setBorder(new LineBorder(Color.BLACK, 1));
 
@@ -83,66 +83,15 @@ public class OrderComponent extends JPanel {
 		updateView();
 	}
 
-//	public void setmPrevOrderComponent(OrderComponent mPrevOrderComponent) {
-//		this.mPrevOrderComponent = mPrevOrderComponent;
-//	}
-//
-//	public void setmNextOrderComponent(OrderComponent mNextOrderComponent) {
-//		this.mNextOrderComponent = mNextOrderComponent;
-//	}
-
 	private void decreaseOrder() {
-		mOrder ++;
+		mOrder++;
 		updateView();
 	}
 
 	private void increaseOrder() {
-		mOrder --;
+		mOrder--;
 		updateView();
 	}
-
-//	private void decreaseOrderRecursive() {
-//		decreaseOrder();
-//		if (mNextOrderComponent != null) {
-//			OrderComponent nn = this.mNextOrderComponent.mNextOrderComponent;
-//			OrderComponent n = this.mNextOrderComponent;
-//			OrderComponent p = this.mPrevOrderComponent;
-//
-//			if (nn != null) {
-//				nn.mPrevOrderComponent = this;
-//			}
-//			if (p != null) {
-//				p.mNextOrderComponent = n;
-//			}
-//			n.mPrevOrderComponent = p;
-//			n.mNextOrderComponent = this;
-//
-//			mPrevOrderComponent = n;
-//			mNextOrderComponent = nn;
-//			n.increaseOrder();
-//		}
-//	}
-//
-//	private void increaseOrderRecursive() {
-//		increaseOrder();
-//		if (mPrevOrderComponent != null) {
-//			OrderComponent pp = this.mPrevOrderComponent.mPrevOrderComponent;
-//			OrderComponent n = this.mNextOrderComponent;
-//			OrderComponent p = this.mPrevOrderComponent;
-//
-//			if (pp != null) {
-//				pp.mNextOrderComponent = this;
-//			}
-//			if (n != null) {
-//				n.mPrevOrderComponent = p;
-//			}
-//			p.mPrevOrderComponent = this;
-//			p.mNextOrderComponent = n;
-//			mPrevOrderComponent = pp;
-//			mNextOrderComponent = p;
-//			p.decreaseOrder();
-//		}
-//	}
 
 	public void updateView() {
 		setupUpButton();
@@ -155,7 +104,7 @@ public class OrderComponent extends JPanel {
 	}
 
 	private void setupDownButton() {
-		if (mOrder >= mAdapter.getMaxOrder() - 1) {
+		if (mOrder >= mTotalItems - 1) {
 			mDownOrderJB.setEnabled(false);
 		} else {
 			mDownOrderJB.setEnabled(true);
@@ -173,12 +122,6 @@ public class OrderComponent extends JPanel {
 	public interface OrderChangeListener {
 
 		void onChangeOrder(int currentOrder, int newOrder, OrderComponent component);
-
-	}
-
-	public interface OrderAdapter {
-
-		int getMaxOrder();
 
 	}
 }

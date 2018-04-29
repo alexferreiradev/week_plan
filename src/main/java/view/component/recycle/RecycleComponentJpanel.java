@@ -9,9 +9,12 @@ import java.beans.PropertyChangeListener;
 
 public class RecycleComponentJpanel extends BaseComponent implements RecycleComponent {
 
-	private final JScrollPane jScrollPane;
-	private final RecycleComponentAdapter mAdapter;
+	private JScrollPane jScrollPane;
+	private RecycleComponentAdapter mAdapter;
 	private JPanel mViewPortJP;
+	private JComponent mHeaderView;
+	private JComponent mFooterView;
+	private JComponent mEmptyView;
 
 	public RecycleComponentJpanel(RecycleComponentAdapter adapter) {
 		this.mAdapter = adapter;
@@ -43,31 +46,73 @@ public class RecycleComponentJpanel extends BaseComponent implements RecycleComp
 
 	private JPanel buildViewPort() {
 		mViewPortJP = new JPanel();
+		mViewPortJP.setBackground(Color.WHITE);
 		mViewPortJP.setLayout(new BoxLayout(mViewPortJP, BoxLayout.PAGE_AXIS));
-		for (int position = 0; position < mAdapter.getTotalItems(); position++) {
-			mViewPortJP.add(mAdapter.getView(position));
+		mViewPortJP.setAlignmentX(LEFT_ALIGNMENT);
+
+		addHeader();
+		if (mAdapter != null) {
+			if (mAdapter.getTotalItems() == 0) {
+				mViewPortJP.add(mEmptyView);
+			} else {
+				for (int position = 0; position < mAdapter.getTotalItems(); position++) {
+					JComponent view = mAdapter.getView(position);
+					view.setAlignmentX(LEFT_ALIGNMENT);
+					mViewPortJP.add(view);
+				}
+			}
+		} else if (mEmptyView != null) {
+			mViewPortJP.add(mEmptyView);
 		}
+		addFooter();
+
+		Component glue = Box.createHorizontalGlue();
+		glue.setBackground(Color.BLUE);
+		glue.setForeground(Color.YELLOW);
+		mViewPortJP.add(glue);
 
 		return mViewPortJP;
 	}
 
-	@Override
-	public void changeItemPosition(int oldPosition, int newPosition) {
-		Component component = mViewPortJP.getComponent(oldPosition);
-		mViewPortJP.remove(oldPosition);
-		mViewPortJP.add(component, newPosition);
-		updateUI();
+	private void addHeader() {
+		if (mHeaderView != null) {
+			mViewPortJP.add(mHeaderView);
+		}
 	}
 
-	@Override
-	public void clear() {
-		mViewPortJP.removeAll();
-		updateUI();
+	private void addFooter() {
+		if (mFooterView != null) {
+			mViewPortJP.add(mFooterView);
+		}
 	}
 
 	@Override
 	public RecycleComponentAdapter getAdapter() {
 		return mAdapter;
+	}
+
+	@Override
+	public void setAdapter(RecycleComponentAdapter adapter) {
+		mAdapter = adapter;
+	}
+
+	@Override
+	public void setEmptyView(JComponent emptyView) {
+		mEmptyView = emptyView;
+	}
+
+	@Override
+	public void addHeaderView(JComponent headerView) {
+		mHeaderView = headerView;
+		headerView.setAlignmentX(LEFT_ALIGNMENT);
+		mViewPortJP.add(headerView, 0);
+	}
+
+	@Override
+	public void addFooterView(JComponent footerView) {
+		mFooterView = footerView;
+		footerView.setAlignmentX(LEFT_ALIGNMENT);
+		mViewPortJP.add(footerView, mViewPortJP.getComponentCount() - 1);
 	}
 
 	@Override

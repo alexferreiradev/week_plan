@@ -1,8 +1,9 @@
 package view.frame;
 
-import builder.LembreteBuilder;
+import builder.LembreteListBuilder;
 import model.Lembrete;
 import processor.LembreteTextProcessor;
+import view.adapter.LeftMenuAdapter;
 import view.component.ActionBar;
 import view.component.LeftMenu;
 import view.component.menu.MenuOption;
@@ -12,7 +13,7 @@ import java.awt.*;
 import java.util.ArrayList;
 import java.util.List;
 
-public class MainFrame extends BaseFrame implements LeftMenu.OptionListener {
+public class MainFrame extends BaseFrame implements LeftMenuAdapter.Listener {
 
     private static final String CREATE_LEMBRETE_ACTION = "create_lembrete";
 
@@ -21,22 +22,26 @@ public class MainFrame extends BaseFrame implements LeftMenu.OptionListener {
     private LeftMenu leftMenu;
     private ActionBar mActionBar;
 
-    public MainFrame() throws HeadlessException {
-        lembreteJP = new JPanel();
+	public MainFrame() throws HeadlessException {
+		lembreteJP = new JPanel();
+	}
 
-        List<MenuOption> options = new ArrayList<>();
-        options.add(new MenuOption("Importar", CREATE_LEMBRETE_ACTION));
-        leftMenu = new LeftMenu("Lembretes", options, this);
-        mActionBar = new ActionBar("Texto para importação");
+	@Override
+	public void showFrame() {
+		List<MenuOption> options = new ArrayList<>();
+		options.add(new MenuOption("Importar", CREATE_LEMBRETE_ACTION));
+		leftMenu = new LeftMenu("Lembretes", options, this);
+		mActionBar = new ActionBar("Texto para importação");
 
-        mContentPanel.add(leftMenu, BorderLayout.WEST);
-        mContentPanel.add(lembreteJP, BorderLayout.CENTER);
-        setupImportPanel();
+		mContentPanel.add(leftMenu, BorderLayout.WEST);
+		mContentPanel.add(lembreteJP, BorderLayout.CENTER);
+		setupImportPanel();
 
-        pack();
-    }
+		pack();
+		setVisible(true);
+	}
 
-    private void setupImportPanel() {
+	private void setupImportPanel() {
         lembreteJP.setLayout(new BoxLayout(lembreteJP, BoxLayout.PAGE_AXIS));
         lembreteJP.setPreferredSize(new Dimension(WIDTH - LeftMenu.WIDTH - 32, 100));
 
@@ -76,22 +81,22 @@ public class MainFrame extends BaseFrame implements LeftMenu.OptionListener {
 
     private void showLembreteList(List<Lembrete> lembreteList) {
         LembreteFrame lembreteFrame = new LembreteFrame(this, lembreteList);
-        lembreteFrame.setVisible(true);
+		lembreteFrame.showFrame();
         dispose();
     }
 
     private List<Lembrete> buildLembreteList() {
         List<String> lembreteTextList = LembreteTextProcessor.fromTextCopied(lembreteTextJTA.getText()).processToList();
-        return LembreteBuilder.fromTextList(lembreteTextList).build();
+		return LembreteListBuilder.fromTextList(lembreteTextList).build();
     }
 
-    @Override
-    public void onOptionSelected(MenuOption option, int position) {
-        System.out.println("Menu selecionado: " + option.getTitle());
-        switch (option.getAction()) {
-            case CREATE_LEMBRETE_ACTION:
-                showLembreteList(buildLembreteList());
-                break;
-        }
-    }
+	@Override
+	public void onOptionAction(int position, MenuOption option) {
+		System.out.println("Menu selecionado: " + option.getTitle());
+		switch (option.getAction()) {
+			case CREATE_LEMBRETE_ACTION:
+				showLembreteList(buildLembreteList());
+				break;
+		}
+	}
 }

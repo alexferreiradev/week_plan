@@ -1,13 +1,15 @@
 package view.frame;
 
+import dto.RecycleItem;
 import model.Lembrete;
 import view.adapter.LembreteAdapter;
 import view.component.ActionBar;
 import view.component.LeftMenu;
-import view.component.LeftMenu.OptionListener;
 import view.component.OrderComponent;
 import view.component.menu.MenuOption;
 import view.component.recycle.RecycleComponentJpanel;
+import view.presenter.LembreteContract;
+import view.presenter.LembretePresenter;
 
 import javax.swing.*;
 import java.awt.*;
@@ -18,31 +20,139 @@ import java.awt.event.ActionListener;
 import java.util.ArrayList;
 import java.util.List;
 
-public class LembreteFrame extends BaseFrame implements OptionListener, ActionListener, ActionBar.ActionBarMenuListener, LembreteAdapter.LembreteListener, OrderComponent.OrderChangeListener {
+public class LembreteFrame extends BaseFrame<LembreteContract.Presenter> implements LembreteContract.View {
 
 	public static final String EXPORT_TO_INBOX_ACTION = "export_lembrete_to_inbox_search";
 	public static final String SELECT_DESELECT_LEMBRETE_ACTION = "select_deselect_lembrete";
 	public static final String REMOVE_LEMBRETE_SELECTED_ACTION = "remove_lembrete_selected";
-	public static final String VOLTAR_ACTION = "voltar";
+	public static final String RE_IMPORT_ACTION = "voltar";
+	public static final String EXPORT_VCS_ACTION = "export_vcs";
 
-	private final JPanel mainJP;
-	private List<Lembrete> mLembreteList;
-	private List<Lembrete> mSelectedLembreteList;
+	private JPanel mainJP;
 	private JFrame mMainFrame;
 	private LeftMenu mLeftMenu;
 	private ActionBar mActionBar;
-	private LembreteAdapter mLembreteAdapter;
 	private RecycleComponentJpanel mRecycleLembrete;
+	private JCheckBox mSelectAllCB;
 
 	public LembreteFrame(JFrame mainFrame, List<Lembrete> lembreteList) throws HeadlessException {
 		this.mMainFrame = mainFrame;
-		this.mLembreteList = lembreteList;
+		mPresenter = new LembretePresenter(this, lembreteList);
+	}
 
-		mainJP = new JPanel();
+	private void buildMainPanel() {
+		mContentPanel.add(mainJP, BorderLayout.CENTER);
+
+		mainJP.setLayout(new BoxLayout(mainJP, BoxLayout.PAGE_AXIS));
+		mainJP.add(mActionBar);
+	}
+
+	private List<MenuOption> buildLeftOptionList() {
 		List<MenuOption> options = new ArrayList<>();
 		options.add(new MenuOption("Exportar para inbox", EXPORT_TO_INBOX_ACTION));
-		options.add(new MenuOption("Re-importar", VOLTAR_ACTION));
+		options.add(new MenuOption("Exportar para vcs", EXPORT_VCS_ACTION));
+		options.add(new MenuOption("Re-importar", RE_IMPORT_ACTION));
+
+		return options;
+	}
+
+	private JPanel buildRecycleHeader() {
+		JPanel recycleHeader = new JPanel();
+		recycleHeader.setBackground(Color.RED);
+		recycleHeader.setLayout(new BoxLayout(recycleHeader, BoxLayout.LINE_AXIS));
+
+		mSelectAllCB = new JCheckBox();
+		mSelectAllCB.setPreferredSize(new Dimension(50, 50));
+		mSelectAllCB.addActionListener(new ActionListener() {
+			@Override
+			public void actionPerformed(ActionEvent e) {
+				JCheckBox source = (JCheckBox) e.getSource();
+				mPresenter.setAllItemsState(source.isSelected());
+			}
+		});
+		recycleHeader.add(mSelectAllCB);
+		recycleHeader.add(new JLabel("Ordem"));
+		recycleHeader.add(new JLabel("Descricao"));
+		recycleHeader.add(new JLabel("Adiar"));
+		recycleHeader.add(Box.createHorizontalGlue());
+
+		return recycleHeader;
+	}
+
+	@Override
+	public void setExportToCSVEnableState(boolean state) {
+		mLeftMenu.setMenuEnableState(EXPORT_VCS_ACTION, state);
+	}
+
+	@Override
+	public void setSelectAllItemState(boolean state) {
+		mSelectAllCB.setSelected(state);
+	}
+
+	@Override
+	public void addTextToClipboard(String text) {
+		StringSelection stringSelection = new StringSelection(text);
+		Clipboard systemClipboard = Toolkit.getDefaultToolkit().getSystemClipboard();
+		systemClipboard.setContents(stringSelection, stringSelection);
+	}
+
+	@Override
+	public void openMainFrame() {
+		dispose();
+		mMainFrame.setVisible(true);
+	}
+
+	@Override
+	public void onActionMenuSelected(MenuOption menuOption, int position) {
+		switch (menuOption.getAction()) {
+			case REMOVE_LEMBRETE_SELECTED_ACTION:
+				mPresenter.removeSelectedItems();
+				break;
+		}
+	}
+
+	@Override
+	public void onSelectedLembrete(RecycleItem<Lembrete> item, int position) {
+		mPresenter.setItemSelectState(item, position, true);
+	}
+
+	@Override
+	public void onUnSelectedLembrete(RecycleItem<Lembrete> item, int position) {
+		mPresenter.setItemSelectState(item, position, false);
+	}
+
+	@Override
+	public void onChangeOrder(int currentOrder, int newOrder, OrderComponent component) {
+		mPresenter.changeLembreteOrder(currentOrder, newOrder);
+	}
+
+	@Override
+	public void onOptionAction(int position, MenuOption option) {
+		switch (option.getAction()) {
+			case EXPORT_TO_INBOX_ACTION:
+				mPresenter.exportToInbox();
+				break;
+			case RE_IMPORT_ACTION:
+				mPresenter.reImport();
+				break;
+			case EXPORT_VCS_ACTION:
+				mPresenter.exportToCSV();
+				break;
+		}
+	}
+
+	@Override
+	public void showFrame() {
+		mPresenter.init();
+	}
+
+	@Override
+	public void onStart() {
+		mainJP = new JPanel();
+		List<MenuOption> options = buildLeftOptionList();
 		mLeftMenu = new LeftMenu("Lembretes", options, this);
+		mLeftMenu.setMenuEnableState(EXPORT_VCS_ACTION, false);
+		mLeftMenu.setMenuToolTip(EXPORT_VCS_ACTION, "Selecione pelo menos um lembrete");
 
 		List<MenuOption> actionBarOptions = new ArrayList<>();
 		actionBarOptions.add(new MenuOption("Remover selecionados", REMOVE_LEMBRETE_SELECTED_ACTION));
@@ -53,112 +163,46 @@ public class LembreteFrame extends BaseFrame implements OptionListener, ActionLi
 		mContentPanel.add(mainJP, BorderLayout.CENTER);
 
 		buildMainPanel();
-		buildLembreteSelectionList();
-
 		pack();
-	}
-
-	private void buildMainPanel() {
-		mContentPanel.add(mainJP, BorderLayout.CENTER);
-
-		mainJP.setLayout(new BoxLayout(mainJP, BoxLayout.PAGE_AXIS));
-		mainJP.add(mActionBar);
+		setVisible(true);
 	}
 
 	@Override
-	public void actionPerformed(ActionEvent e) {
-		switch (e.getActionCommand()) {
-			case SELECT_DESELECT_LEMBRETE_ACTION:
-				JCheckBox checkbox = (JCheckBox) e.getSource();
-				break;
-		}
+	public void createList(LembreteAdapter adapter) {
+		mRecycleLembrete = new RecycleComponentJpanel(adapter);
+		mRecycleLembrete.addHeaderView(buildRecycleHeader());
+		mRecycleLembrete.setEmptyView(new JLabel("Não foi importado nenhum lembrete"));
 
-		pack();
-	}
-
-	private void voltarTelaMain() {
-		dispose();
-		mMainFrame.setVisible(true);
-	}
-
-	private void removeSelectedLembrete() {
-		mActionBar.hideOptionsMenu();
-		for (Lembrete lembrete : mSelectedLembreteList) {
-			mLembreteAdapter.removeItem(mLembreteAdapter.getItemPosition(lembrete));
-		}
-		mRecycleLembrete.notifyAdapterChanged();
-	}
-
-	private void exportToInbox() {
-		String textToInbox = buildTextToInbox();
-		addSearchTextToClipBoard(textToInbox);
-		JOptionPane.showMessageDialog(this, "Texto copiado para área de transferência:\n\n" + textToInbox);
-	}
-
-	private String buildTextToInbox() {
-		StringBuilder stringBuilder = new StringBuilder("is:reminder {");
-		for (Lembrete lembrete : mSelectedLembreteList) {
-			stringBuilder.append("\"").append(lembrete.getDescricao()).append("\", ");
-		}
-		stringBuilder.append("}");
-		String textToInbox = stringBuilder.toString();
-		textToInbox = textToInbox.replaceAll(", }", "}");
-		return textToInbox;
-	}
-
-	private void addSearchTextToClipBoard(String textToInbox) {
-		StringSelection stringSelection = new StringSelection(textToInbox);
-		Clipboard systemClipboard = Toolkit.getDefaultToolkit().getSystemClipboard();
-		systemClipboard.setContents(stringSelection, stringSelection);
-	}
-
-	private void buildLembreteSelectionList() {
-		mSelectedLembreteList = new ArrayList<>();
-		mLembreteAdapter = new LembreteAdapter(mLembreteList, this, this);
-		mRecycleLembrete = new RecycleComponentJpanel(mLembreteAdapter);
 		mainJP.add(mRecycleLembrete);
 	}
 
 	@Override
-	public void onOptionSelected(MenuOption option, int position) {
-		switch (option.getAction()) {
-			case EXPORT_TO_INBOX_ACTION:
-				exportToInbox();
-				break;
-			case VOLTAR_ACTION:
-				voltarTelaMain();
-				break;
-		}
+	public void clearList() {
+		mRecycleLembrete.setAdapter(null);
+		mRecycleLembrete.notifyAdapterChanged();
 	}
 
 	@Override
-	public void onActionMenuSelected(MenuOption menuOption, int position) {
-		switch (menuOption.getAction()) {
-			case REMOVE_LEMBRETE_SELECTED_ACTION:
-				removeSelectedLembrete();
-				break;
-		}
+	public void updateListView() {
+		mRecycleLembrete.notifyAdapterChanged();
 	}
 
 	@Override
-	public void onSelectedLembrete(Lembrete lembrete, int position) {
-		mSelectedLembreteList.add(lembrete);
+	public void showActionBarOptions() {
 		if (!mActionBar.isOptionMenuListShowing()) {
 			mActionBar.showOptionMenuList();
 		}
 	}
 
 	@Override
-	public void onUnSelectedLembrete(Lembrete lembrete, int position) {
-		mSelectedLembreteList.remove(lembrete);
-		if (mSelectedLembreteList.isEmpty() && mActionBar.isOptionMenuListShowing()) {
+	public void hideActionBarOptions() {
+		if (mActionBar.isOptionMenuListShowing()) {
 			mActionBar.hideOptionsMenu();
 		}
 	}
 
 	@Override
-	public void onChangeOrder(int currentOrder, int newOrder, OrderComponent component) {
-		mLembreteAdapter.changeItemPosition(currentOrder, newOrder);
-		mRecycleLembrete.notifyAdapterChanged();
+	public void showInfoMsg(String msg) {
+		JOptionPane.showMessageDialog(this, msg, "Informação", JOptionPane.INFORMATION_MESSAGE);
 	}
 }
