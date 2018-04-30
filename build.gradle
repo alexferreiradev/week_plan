@@ -8,11 +8,6 @@
 
 // Apply the java-library plugin to add support for Java Library
 buildscript {
-    repositories {
-        maven {
-            url 'https://plugins.gradle.org/m2/'
-        }
-    }
     dependencies {
         classpath 'net.researchgate:gradle-release:2.6.0'
     }
@@ -32,7 +27,6 @@ repositories {
 
 dependencies {
     // This dependency is exported to consumers, that is to say found on their compile classpath.
-    api "net.researchgate:gradle-release:2.7.0"
     api 'org.apache.commons:commons-math3:3.6.1'
 
     // This dependency is used internally, and not exposed to consumers on their own compile classpath.
