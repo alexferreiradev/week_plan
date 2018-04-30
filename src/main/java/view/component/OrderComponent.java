@@ -71,7 +71,7 @@ public class OrderComponent extends BaseComponent {
 		setAlignmentX(LEFT_ALIGNMENT);
 		setPreferredSize(new Dimension(90, 30));
 		setMaximumSize(new Dimension(90, 30));
-		setBackground(Color.BLUE);
+		setBackground(Color.WHITE);
 	}
 
 	@Override

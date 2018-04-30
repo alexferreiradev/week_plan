@@ -2,6 +2,7 @@ package view.frame;
 
 import dto.RecycleItem;
 import model.Lembrete;
+import util.CheckBox;
 import view.adapter.LembreteAdapter;
 import view.component.ActionBar;
 import view.component.LeftMenu;
@@ -63,6 +64,8 @@ public class LembreteFrame extends BaseFrame<LembreteContract.Presenter> impleme
 		recycleHeader.setMaximumSize(new Dimension(Integer.MAX_VALUE, 50));
 
 		mSelectAllCB = new JCheckBox();
+		mSelectAllCB.setFont(mSelectAllCB.getFont().deriveFont(22f));
+		CheckBox.scaleCheckBoxIcon(mSelectAllCB);
 		mSelectAllCB.setBackground(Color.WHITE);
 		mSelectAllCB.setContentAreaFilled(false);
 		mSelectAllCB.setPreferredSize(new Dimension(50, 50));

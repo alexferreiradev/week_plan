@@ -2,6 +2,7 @@ package view.adapter;
 
 import dto.RecycleItem;
 import model.Lembrete;
+import util.CheckBox;
 import view.component.OrderComponent;
 import view.component.recycle.RecycleComponentAdapter;
 
@@ -51,7 +52,13 @@ public class LembreteAdapter implements RecycleComponentAdapter<RecycleItem<Lemb
 		}
 		checkBox.setAlignmentX(LEFT_ALIGNMENT);
 		checkBox.setBackground(Color.WHITE);
-		checkBox.setPreferredSize(new Dimension(50, 50));
+//		checkBox.setPreferredSize(new Dimension(50, 50));
+//		checkBox.setMaximumSize(new Dimension(100, 100));
+		checkBox.setFont(checkBox.getFont().deriveFont(22f));
+		CheckBox.scaleCheckBoxIcon(checkBox);
+
+//		checkBox.setText("Teste");
+//		checkBox.setMargin(new Insets(50,50,50,50));
 		checkBox.setActionCommand(SELECT_DESELECT_LEMBRETE_ACTION);
 		checkBox.addActionListener(new ActionListener() {
 			@Override
