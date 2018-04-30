@@ -17,6 +17,7 @@ public class LembretePresenter implements LembreteContract.Presenter {
 	private LembreteContract.View mView;
 	private List<Lembrete> mLembreteList;
 	private LembreteAdapter mLembreteAdapter;
+	private int mTotalItemsSelected;
 
 	public LembretePresenter(LembreteContract.View view, List<Lembrete> lembreteList) {
 		this.mView = view;
@@ -36,6 +37,10 @@ public class LembretePresenter implements LembreteContract.Presenter {
 		textToInbox = textToInbox.replaceAll(", }", "}");
 
 		return textToInbox;
+	}
+
+	private void initTotalItemSelected() {
+		mTotalItemsSelected = 0;
 	}
 
 	@Override
@@ -98,6 +103,11 @@ public class LembretePresenter implements LembreteContract.Presenter {
 		mView.onStart();
 		mLembreteAdapter = new LembreteAdapter(mLembreteList, mView);
 		mView.createList(mLembreteAdapter);
+		if (mLembreteAdapter.getTotalItems() > 0) {
+			mView.setSelectAllItemViewEnableState(true);
+		}
+		mView.setActionBarTitle(mLembreteAdapter.getTotalItems() + " lembretes importados");
+		initTotalItemSelected();
 	}
 
 	@Override
@@ -123,29 +133,34 @@ public class LembretePresenter implements LembreteContract.Presenter {
 		}
 
 		if (mLembreteAdapter.getTotalItems() == 0) {
-			mView.setSelectAllItemState(false);
-		} else {
-			mView.setSelectAllItemState(true);
+			mView.setSelectAllItemViewSelected(false);
+			mView.setSelectAllItemViewEnableState(false);
 		}
 
+		initTotalItemSelected();
+		setSelectedViewState();
 		mView.updateListView();
 		mView.hideActionBarOptions();
 	}
 
 	@Override
 	public void setItemSelectState(RecycleItem<Lembrete> item, int position, boolean state) {
-		item.setSelected(state);
-		boolean hasSelected = false;
-		for (int i = 0; i < mLembreteAdapter.getTotalItems(); i++) {
-			if (mLembreteAdapter.getItem(i).isSelected()) {
-				hasSelected = true;
-				break;
-			}
+		if (!state) {
+			mView.setSelectAllItemViewSelected(state);
+			mTotalItemsSelected--;
+		} else {
+			mTotalItemsSelected++;
 		}
 
-		if (hasSelected) {
+		item.setSelected(state);
+		setSelectedViewState();
+	}
+
+	private void setSelectedViewState() {
+		if (mTotalItemsSelected > 0) {
 			mView.showActionBarOptions();
 			mView.setExportToCSVEnableState(true);
+			mView.setRemoveABOTitle("Remover " + mTotalItemsSelected + " lembretes");
 		} else {
 			mView.hideActionBarOptions();
 			mView.setExportToCSVEnableState(false);
@@ -159,12 +174,13 @@ public class LembretePresenter implements LembreteContract.Presenter {
 			item.setSelected(state);
 			mLembreteAdapter.setItemIn(i, item);
 		}
-		if (state) {
-			mView.showActionBarOptions();
-		} else {
-			mView.hideActionBarOptions();
-		}
 
+		if (state) {
+			mTotalItemsSelected = mLembreteAdapter.getTotalItems();
+		} else {
+			initTotalItemSelected();
+		}
+		setSelectedViewState();
 		mView.updateListView();
 	}
 }

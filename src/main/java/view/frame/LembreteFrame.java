@@ -58,10 +58,13 @@ public class LembreteFrame extends BaseFrame<LembreteContract.Presenter> impleme
 
 	private JPanel buildRecycleHeader() {
 		JPanel recycleHeader = new JPanel();
-		recycleHeader.setBackground(Color.RED);
+		recycleHeader.setBackground(Color.WHITE);
 		recycleHeader.setLayout(new BoxLayout(recycleHeader, BoxLayout.LINE_AXIS));
+		recycleHeader.setMaximumSize(new Dimension(Integer.MAX_VALUE, 50));
 
 		mSelectAllCB = new JCheckBox();
+		mSelectAllCB.setBackground(Color.WHITE);
+		mSelectAllCB.setContentAreaFilled(false);
 		mSelectAllCB.setPreferredSize(new Dimension(50, 50));
 		mSelectAllCB.addActionListener(new ActionListener() {
 			@Override
@@ -70,13 +73,26 @@ public class LembreteFrame extends BaseFrame<LembreteContract.Presenter> impleme
 				mPresenter.setAllItemsState(source.isSelected());
 			}
 		});
+		int margin = 16;
+		recycleHeader.add(Box.createHorizontalStrut(margin));
 		recycleHeader.add(mSelectAllCB);
+		recycleHeader.add(Box.createHorizontalStrut(margin));
 		recycleHeader.add(new JLabel("Ordem"));
+		recycleHeader.add(Box.createHorizontalStrut(margin));
 		recycleHeader.add(new JLabel("Descricao"));
+		recycleHeader.add(Box.createHorizontalStrut(44));
 		recycleHeader.add(new JLabel("Adiar"));
 		recycleHeader.add(Box.createHorizontalGlue());
+		recycleHeader.add(Box.createHorizontalStrut(margin));
 
 		return recycleHeader;
+	}
+
+	@Override
+	public void setRemoveABOTitle(String removeTitle) {
+		MenuOption menuOption = mActionBar.getOptionMenu(REMOVE_LEMBRETE_SELECTED_ACTION);
+		menuOption.setTitle(removeTitle);
+		mActionBar.notifyOptionChanged();
 	}
 
 	@Override
@@ -85,8 +101,18 @@ public class LembreteFrame extends BaseFrame<LembreteContract.Presenter> impleme
 	}
 
 	@Override
-	public void setSelectAllItemState(boolean state) {
+	public void setActionBarTitle(String title) {
+		mActionBar.setTitle(title);
+	}
+
+	@Override
+	public void setSelectAllItemViewSelected(boolean state) {
 		mSelectAllCB.setSelected(state);
+	}
+
+	@Override
+	public void setSelectAllItemViewEnableState(boolean state) {
+		mSelectAllCB.setEnabled(state);
 	}
 
 	@Override
@@ -152,12 +178,12 @@ public class LembreteFrame extends BaseFrame<LembreteContract.Presenter> impleme
 		List<MenuOption> options = buildLeftOptionList();
 		mLeftMenu = new LeftMenu("Lembretes", options, this);
 		mLeftMenu.setMenuEnableState(EXPORT_VCS_ACTION, false);
-		mLeftMenu.setMenuToolTip(EXPORT_VCS_ACTION, "Selecione pelo menos um lembrete");
+		mLeftMenu.setMenuToolTip(EXPORT_VCS_ACTION, "Selecione um lembrete e exporte para arquivo csv. Util para google agenda.");
 
 		List<MenuOption> actionBarOptions = new ArrayList<>();
 		actionBarOptions.add(new MenuOption("Remover selecionados", REMOVE_LEMBRETE_SELECTED_ACTION));
 		mActionBar = new ActionBar("Lembretes importados", actionBarOptions, this);
-		mActionBar.hideOptionsMenu();
+		mActionBar.setOptionViewsVisibility(false);
 
 		mContentPanel.add(mLeftMenu, BorderLayout.WEST);
 		mContentPanel.add(mainJP, BorderLayout.CENTER);
@@ -190,14 +216,14 @@ public class LembreteFrame extends BaseFrame<LembreteContract.Presenter> impleme
 	@Override
 	public void showActionBarOptions() {
 		if (!mActionBar.isOptionMenuListShowing()) {
-			mActionBar.showOptionMenuList();
+			mActionBar.setOptionViewsVisibility(true);
 		}
 	}
 
 	@Override
 	public void hideActionBarOptions() {
 		if (mActionBar.isOptionMenuListShowing()) {
-			mActionBar.hideOptionsMenu();
+			mActionBar.setOptionViewsVisibility(false);
 		}
 	}
 

@@ -37,16 +37,20 @@ public class LembreteAdapter implements RecycleComponentAdapter<RecycleItem<Lemb
 		return itemList;
 	}
 
-	private void addItemJp(JPanel itemsJP, RecycleItem<Lembrete> item, int position) {
+	@Override
+	public JComponent getView(int position) {
+		RecycleItem<Lembrete> item = mItemList.get(position);
 		JPanel itemJP = new JPanel();
 		itemJP.setLayout(new BoxLayout(itemJP, BoxLayout.LINE_AXIS));
-//		itemJP.setBackground(Color.GREEN);
+		itemJP.setBackground(Color.WHITE);
+		itemJP.setMaximumSize(new Dimension(Integer.MAX_VALUE, 60));
 
 		JCheckBox checkBox = new JCheckBox();
 		if (item.isSelected()) {
 			checkBox.setSelected(true);
 		}
 		checkBox.setAlignmentX(LEFT_ALIGNMENT);
+		checkBox.setBackground(Color.WHITE);
 		checkBox.setPreferredSize(new Dimension(50, 50));
 		checkBox.setActionCommand(SELECT_DESELECT_LEMBRETE_ACTION);
 		checkBox.addActionListener(new ActionListener() {
@@ -60,35 +64,18 @@ public class LembreteAdapter implements RecycleComponentAdapter<RecycleItem<Lemb
 			}
 		});
 
-		itemJP.add(checkBox);
 		OrderComponent orderComponent = new OrderComponent(position, mLembreteListener, mItemList.size());
 		orderComponent.setAlignmentX(LEFT_ALIGNMENT);
 
+		itemJP.add(Box.createHorizontalStrut(16));
+		itemJP.add(checkBox);
+		itemJP.add(Box.createHorizontalStrut(16));
 		itemJP.add(orderComponent);
+		itemJP.add(Box.createHorizontalStrut(16));
 		// todo add ao model estado (ENUM) e mudar descricao de acordo com estado
 		itemJP.add(new JLabel(item.getItem().getDescricao()));
-		itemJP.setAlignmentX(0f);
-		// todo add coluna de adiar
 
-		JComponent itemSeparator = new JPanel(new BorderLayout());
-		Dimension preferredSize = new Dimension(itemsJP.getPreferredSize());
-		preferredSize.setSize(preferredSize.width, 0.5);
-		itemSeparator.setPreferredSize(preferredSize);
-		itemSeparator.setBackground(Color.BLACK);
-		itemsJP.add(Box.createHorizontalStrut(5));
-		itemsJP.add(itemJP);
-		itemsJP.add(itemSeparator);
-		itemsJP.add(Box.createHorizontalStrut(5));
-	}
-
-	@Override
-	public JComponent getView(int position) {
-		RecycleItem<Lembrete> item = mItemList.get(position);
-		JPanel itemsJP = new JPanel();
-		itemsJP.setLayout(new BoxLayout(itemsJP, BoxLayout.PAGE_AXIS));
-		addItemJp(itemsJP, item, position);
-
-		return itemsJP;
+		return itemJP;
 	}
 
 	@Override

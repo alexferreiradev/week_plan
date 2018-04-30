@@ -47,8 +47,14 @@ public interface LembreteContract {
 
 		void addTextToClipboard(String text);
 
-		void setSelectAllItemState(boolean state);
+		void setSelectAllItemViewEnableState(boolean state);
 
 		void setExportToCSVEnableState(boolean state);
+
+		void setSelectAllItemViewSelected(boolean state);
+
+		void setActionBarTitle(String title);
+
+		void setRemoveABOTitle(String removeTitle);
 	}
 }

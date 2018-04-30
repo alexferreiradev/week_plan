@@ -34,6 +34,7 @@ public class RecycleComponentJpanel extends BaseComponent implements RecycleComp
 		add(jScrollPane, BorderLayout.CENTER);
 
 		JPanel viewPortJP = buildViewPort();
+		jScrollPane.setBackground(Color.WHITE);
 		jScrollPane.setViewportView(viewPortJP);
 		jScrollPane.addPropertyChangeListener(new PropertyChangeListener() {
 			@Override
