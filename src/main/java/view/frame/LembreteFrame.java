@@ -50,7 +50,7 @@ public class LembreteFrame extends BaseFrame<LembreteContract.Presenter> impleme
 	private List<MenuOption> buildLeftOptionList() {
 		List<MenuOption> options = new ArrayList<>();
 		options.add(new MenuOption("Exportar para inbox", EXPORT_TO_INBOX_ACTION));
-		options.add(new MenuOption("Exportar para vcs", EXPORT_VCS_ACTION));
+		options.add(new MenuOption("Exportar para csv", EXPORT_VCS_ACTION));
 		options.add(new MenuOption("Re-importar", RE_IMPORT_ACTION));
 
 		return options;
@@ -197,7 +197,12 @@ public class LembreteFrame extends BaseFrame<LembreteContract.Presenter> impleme
 	public void createList(LembreteAdapter adapter) {
 		mRecycleLembrete = new RecycleComponentJpanel(adapter);
 		mRecycleLembrete.addHeaderView(buildRecycleHeader());
-		mRecycleLembrete.setEmptyView(new JLabel("Não foi importado nenhum lembrete"));
+		Box horizontalBox = Box.createHorizontalBox();
+		horizontalBox.add(Box.createHorizontalStrut(16));
+		horizontalBox.add(new JLabel("Não foi importado nenhum lembrete"));
+		horizontalBox.setAlignmentX(Component.LEFT_ALIGNMENT);
+		horizontalBox.setMaximumSize(new Dimension(Integer.MAX_VALUE, 50));
+		mRecycleLembrete.setEmptyView(horizontalBox);
 
 		mainJP.add(mRecycleLembrete);
 	}

@@ -54,7 +54,7 @@ public class RecycleComponentJpanel extends BaseComponent implements RecycleComp
 		addHeader();
 		if (mAdapter != null) {
 			if (mAdapter.getTotalItems() == 0) {
-				mViewPortJP.add(mEmptyView);
+				addEmptyView();
 			} else {
 				for (int position = 0; position < mAdapter.getTotalItems(); position++) {
 					JComponent view = mAdapter.getView(position);
@@ -62,8 +62,8 @@ public class RecycleComponentJpanel extends BaseComponent implements RecycleComp
 					mViewPortJP.add(view);
 				}
 			}
-		} else if (mEmptyView != null) {
-			mViewPortJP.add(mEmptyView);
+		} else {
+			addEmptyView();
 		}
 		addFooter();
 
@@ -73,6 +73,12 @@ public class RecycleComponentJpanel extends BaseComponent implements RecycleComp
 		mViewPortJP.add(glue);
 
 		return mViewPortJP;
+	}
+
+	private void addEmptyView() {
+		if (mEmptyView != null) {
+			mViewPortJP.add(mEmptyView);
+		}
 	}
 
 	private void addHeader() {

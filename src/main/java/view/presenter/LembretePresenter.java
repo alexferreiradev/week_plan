@@ -108,6 +108,7 @@ public class LembretePresenter implements LembreteContract.Presenter {
 		}
 		mView.setActionBarTitle(mLembreteAdapter.getTotalItems() + " lembretes importados");
 		initTotalItemSelected();
+		mView.updateListView();
 	}
 
 	@Override
@@ -135,6 +136,9 @@ public class LembretePresenter implements LembreteContract.Presenter {
 		if (mLembreteAdapter.getTotalItems() == 0) {
 			mView.setSelectAllItemViewSelected(false);
 			mView.setSelectAllItemViewEnableState(false);
+			mView.setActionBarTitle("Lembretes importados");
+		} else {
+			mView.setActionBarTitle(mLembreteAdapter.getTotalItems() + " lembretes importados");
 		}
 
 		initTotalItemSelected();
