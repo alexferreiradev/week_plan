@@ -8,8 +8,10 @@ import model.Lembrete;
 import view.adapter.LembreteAdapter;
 
 import java.io.File;
+import java.text.DateFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
+import java.util.Date;
 import java.util.List;
 
 public class LembretePresenter implements LembreteContract.Presenter {
@@ -69,7 +71,10 @@ public class LembretePresenter implements LembreteContract.Presenter {
 		for (Lembrete lembrete : selectedLembreteList) {
 			GoogleAgendaEvent googleAgendaEvent = new GoogleAgendaEvent();
 			googleAgendaEvent.setSubject(lembrete.getDescricao());
-			googleAgendaEvent.setDescription("Gerado pelo Week Plan Software");
+
+			String createdDay = DateFormat.getDateInstance(DateFormat.SHORT).format(new Date());
+			String createdTime = DateFormat.getTimeInstance(DateFormat.SHORT).format(new Date());
+			googleAgendaEvent.setDescription("Gerado pelo WeekPlaner: " + createdDay + "T" + createdTime);
 			googleAgendaEvent.setPrivate(false);
 
 			Calendar calendar = Calendar.getInstance();
@@ -77,7 +82,7 @@ public class LembretePresenter implements LembreteContract.Presenter {
 			calendar.set(Calendar.MINUTE, 0);
 			googleAgendaEvent.setStartDate(calendar.getTime());
 			calendar.set(Calendar.HOUR_OF_DAY, 21);
-			calendar.set(Calendar.MINUTE, 30);
+			calendar.set(Calendar.MINUTE, 0);
 			googleAgendaEvent.setEndDate(calendar.getTime());
 
 			events.add(googleAgendaEvent);
