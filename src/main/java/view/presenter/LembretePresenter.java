@@ -70,7 +70,7 @@ public class LembretePresenter implements LembreteContract.Presenter {
 			GoogleAgendaEvent googleAgendaEvent = new GoogleAgendaEvent();
 			googleAgendaEvent.setSubject(lembrete.getDescricao());
 			googleAgendaEvent.setDescription("Gerado pelo Week Plan Software");
-			googleAgendaEvent.setPrivate(true);
+			googleAgendaEvent.setPrivate(false);
 
 			Calendar calendar = Calendar.getInstance();
 			calendar.set(Calendar.HOUR_OF_DAY, 20);
